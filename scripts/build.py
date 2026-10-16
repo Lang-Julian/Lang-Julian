@@ -26,8 +26,12 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "assets"
 W = 880
 
-# Set to True once naming the client companies is cleared.
-NAME_CLIENTS = False
+# Siemens Energy was a CompuSafe client; flip once naming it is cleared.
+NAME_SIEMENS = False
+
+# Upstream pull requests, newest first: (repo, number, title, state). Only
+# "merged" or "open" ones that exist on GitHub belong here.
+UPSTREAM = []
 
 THEMES = {
     "dark": dict(fg="#f5f5f5", fg2="#d4d4d4", muted="#a3a3a3", subtle="#737373",
@@ -378,8 +382,8 @@ def planet(doc, t, x0, y0):
 # ── pieces ──────────────────────────────────────────────────────────────────
 
 def hero(t):
-    doc = Doc(W, 452, "Julian Antony Lang — CTO, AI-Z Group",
-              "Julian Antony Lang. CTO at AI-Z Group in Stuttgart and inventor of Brane AIF, the AI "
+    doc = Doc(W, 470, "Julian Antony Lang — Co-Founder & CTO, AI-Z Group",
+              "Julian Antony Lang. Co-Founder and CTO at AI-Z Group in Stuttgart and inventor of Brane AIF, the AI "
               "Interaction Firewall. Builds AI that runs on the machine in front of you and decides "
               "what is allowed to leave it. Beside the text, a halftone globe turns while a satellite circles it.")
     doc.style.append(FADE)
@@ -387,23 +391,25 @@ def hero(t):
     doc.text(0, 30, "STUTTGART  ·  48.78° N  9.18° E", 10.5, t["subtle"], "mono", 400, .14, cls="f", delay=.1)
     doc.text(-3, 112, "Julian Antony", 62, t["fg"], "sans", 600, -.035, cls="f", delay=.2)
     doc.text(-3, 178, "Lang", 62, t["fg"], "sans", 600, -.035, cls="f", delay=.28)
-    doc.text(0, 222, "CTO, AI-Z Group  ·  Inventor of Brane AIF", 17, t["fg2"], "sans", 500, -.005,
+    doc.text(0, 222, "Co-Founder & CTO, AI-Z Group  ·  Inventor of Brane AIF", 17, t["fg2"], "sans", 500, -.005,
              cls="f", delay=.4)
     statement = "I build AI that runs on the machine in front of you — and decides what is allowed to leave it."
     for i, line in enumerate(doc.wrap(statement, 430, 17)):
         doc.text(0, 254 + i * 26, line, 17, t["muted"], "sans", 400, -.005, cls="f", delay=.48 + i * .06)
     hairline(doc, 340, t["line"])
     cols = [
-        ("NOW", ["CTO, AI-Z Group", "Brane AIF, on-prem"]),
+        ("NOW", ["Co-Founder & CTO", "AI-Z Group, Stuttgart", "Brane AIF, on-prem"]),
         ("BEFORE", ["CompuSafe Data Systems",
-                    "Allianz · Siemens Energy" if NAME_CLIENTS else "GenAI, insurance & energy"]),
-        ("OWN", ["architecture · product", "engineering · partnerships"]),
-        ("STACK", ["TypeScript · Python · Rust", "Swift · C · ARM64 asm"]),
+                    "developer at Allianz Technology",
+                    "GenAI for Siemens Energy" if NAME_SIEMENS else "co-founder, Omega VR (2022)"]),
+        ("OWN", ["architecture", "product · engineering", "technical partnerships"]),
+        ("STACK", ["TypeScript · Python", "Rust · Swift · C", "ARM64 NEON assembly"]),
     ]
     for i, (label, lines) in enumerate(cols):
         x = i * 224
         doc.text(x, 376, label, 10.5, t["subtle"], "mono", 400, .14, cls="f", delay=.7 + i * .06)
         for j, line in enumerate(lines):
+            assert doc.measure(line, 13.5) < 214, line
             doc.text(x, 402 + j * 21, line, 13.5, t["fg2"], "sans", 400, 0, cls="f", delay=.74 + i * .06)
     return doc.render()
 
@@ -466,14 +472,24 @@ def now(t):
 
 
 def work_row(t, i, w):
-    doc = Doc(W, 86, f"{w['repo']} — {w['desc']}")
+    doc = Doc(W, 46, f"{w['repo']} — {w['desc']}")
     if i > 1:
         hairline(doc, 0, t["line"])
-    doc.text(0, 36, f"{i:02d}", 10.5, t["subtle"], "mono", 400, .1)
-    doc.text(36, 37, w["repo"], 16, t["fg"], "mono", 500, -.01)
-    doc.text(220, 37, w["desc"], 15, t["fg2"], "sans", 400, -.003)
-    doc.text(220, 62, w["detail"], 11.5, t["subtle"], "mono", 400, .01)
-    doc.text(W, 36, f"{w['tech']}  ↗", 10.5, t["subtle"], "mono", 400, .06, anchor="end")
+    doc.text(0, 28, f"{i:02d}", 10, t["subtle"], "mono", 400, .1)
+    doc.text(36, 29, w["repo"], 13.5, t["fg2"], "mono", 500, -.01)
+    doc.text(200, 29, w["desc"], 13.5, t["muted"], "sans", 400, -.003)
+    doc.text(W, 28, f"{w['tech']}  ↗", 10, t["subtle"], "mono", 400, .06, anchor="end")
+    return doc.render()
+
+
+def upstream_row(t, i, u):
+    repo, number, title, state = u
+    doc = Doc(W, 46, f"{repo}#{number} — {title} ({state})")
+    if i > 1:
+        hairline(doc, 0, t["line"])
+    doc.text(0, 29, repo, 13.5, t["fg"], "mono", 500, -.01)
+    doc.text(260, 29, title, 13.5, t["fg2"], "sans", 400, -.003)
+    doc.text(W, 28, f"#{number}  ·  {state}  ↗", 10, t["subtle"], "mono", 400, .06, anchor="end")
     return doc.render()
 
 
@@ -493,6 +509,48 @@ def footer(t):
     return doc.render()
 
 
+# ── README ──────────────────────────────────────────────────────────────────
+
+RAW = "https://raw.githubusercontent.com/Lang-Julian/Lang-Julian/output"
+
+
+def pic(name, alt, link=None, src=None):
+    dark, light = (f"{src}-dark.svg", f"{src}-light.svg") if src else (f"assets/{name}-dark.svg", f"assets/{name}-light.svg")
+    tag = (f'<picture><source media="(prefers-color-scheme: dark)" srcset="{dark}">'
+           f'<source media="(prefers-color-scheme: light)" srcset="{light}">'
+           f'<img src="{dark}" width="880" alt="{escape(alt, {chr(34): "&quot;"})}"></picture>')
+    return f'<a href="{link}">{tag}</a>' if link else tag
+
+
+def readme():
+    who = "Allianz Technology" + (" and Siemens Energy" if NAME_SIEMENS else "")
+    blocks = [
+        [pic("hero", "Julian Antony Lang — Co-Founder & CTO, AI-Z Group, inventor of Brane AIF. I build AI that runs "
+                     "on the machine in front of you and decides what is allowed to leave it. Before: CompuSafe Data "
+                     f"Systems, developer at {who}; co-founder of Omega VR. Beside the name, a halftone globe turns.")],
+        [pic("s1", "Now: Brane AIF, the AI Interaction Firewall"),
+         pic("now", "As CTO I own the architecture of Brane AIF, an on-prem firewall between a company and every AI "
+                    "model. Every prompt is inspected, classified by intent, checked against policy and routed in under "
+                    "200 ms. Sensitive data stays on a private model; the rest reaches cloud models anonymised and is "
+                    "rehydrated in the answer.", link="https://ai-z-group.com/en/brane")],
+    ]
+    if UPSTREAM:
+        rows = [pic(f"up-{r.replace('/', '-')}-{n}", f"{r}#{n} — {title} ({state})",
+                    link=f"https://github.com/{r}/pull/{n}") for r, n, title, state in UPSTREAM]
+        blocks.append([pic("s-upstream", "Open source: upstream pull requests"), "<br>".join(rows)])
+    blocks.append([pic("s-activity", "Activity. Client work before AI-Z lives on internal Git servers."),
+                   pic(None, "A snake eats the contribution graph of the last twelve months, one day at a time.",
+                       src=f"{RAW}/snake")])
+    blocks.append([pic("s-projects", "Side projects, public and MIT licensed"),
+                   "<br>".join(pic(f"work-{w['repo']}", f"{w['repo']} — {w['desc']}",
+                                   link=f"https://github.com/Lang-Julian/{w['repo']}") for w in WORK)])
+    blocks.append([pic("footer", "Pi in hexadecimal, fading out. Plain SVG drawn by scripts/build.py — no trackers, no widgets.")])
+    body = "\n\n".join("<p>\n  " + "\n  ".join(b) + "\n</p>" for b in blocks)
+    return (body + "\n\n<!-- Generated by scripts/build.py, README included: edit the data there and run\n"
+            "     uv run --no-project --with fonttools --with uharfbuzz python scripts/build.py\n"
+            "     The snake is redrawn daily by .github/workflows/snake.yml onto the output branch. -->\n")
+
+
 def main():
     global FONT_B64
     FONT_B64 = mono_subset_b64(DOTS + " ")
@@ -504,14 +562,24 @@ def main():
             f"hero-{name}.svg": hero(t),
             f"s1-{name}.svg": section(t, "01", "Now — Brane AIF", "the AI Interaction Firewall"),
             f"now-{name}.svg": now(t),
-            f"s2-{name}.svg": section(t, "02", "Selected work", "public · MIT"),
-            f"s3-{name}.svg": section(t, "03", "Activity", "client work before AI-Z lives on internal Git servers"),
-            f"footer-{name}.svg": footer(t),
         }
+        n = 2
+        if UPSTREAM:
+            files[f"s-upstream-{name}.svg"] = section(t, f"{n:02d}", "Open source", "upstream pull requests")
+            for i, u in enumerate(UPSTREAM, 1):
+                files[f"up-{u[0].replace('/', '-')}-{u[1]}-{name}.svg"] = upstream_row(t, i, u)
+            n += 1
+        files[f"s-activity-{name}.svg"] = section(
+            t, f"{n:02d}", "Activity", "client work before AI-Z lives on internal Git servers")
+        files[f"s-projects-{name}.svg"] = section(t, f"{n + 1:02d}", "Side projects", "public · MIT")
+        files.update({
+            f"footer-{name}.svg": footer(t),
+        })
         for i, w in enumerate(WORK, 1):
             files[f"work-{w['repo']}-{name}.svg"] = work_row(t, i, w)
         for fn, svg in files.items():
             (OUT / fn).write_text(svg, encoding="utf-8")
+    (ROOT / "README.md").write_text(readme(), encoding="utf-8")
     total = sum(p.stat().st_size for p in OUT.glob("*.svg"))
     print(f"wrote {len(list(OUT.glob('*.svg')))} files, {total / 1024:.0f} KB, to {OUT}")
 
