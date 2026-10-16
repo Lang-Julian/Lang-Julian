@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="60" viewBox="0 0 880 60" role="img" aria-label="exit — process completed">
+<style>
+  .m { font-family: ui-monospace,SFMono-Regular,'SF Mono',Menlo,Monaco,Consolas,'Liberation Mono','DejaVu Sans Mono',monospace; }
+  .s { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Helvetica,Arial,sans-serif; }
+  .f { animation: in .45s cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+  @keyframes blink { 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .f, .cur { animation: none !important; } }
+</style>
+<line x1="0" y1="10.5" x2="880" y2="10.5" stroke="#dcd8ce"/>
+<text class="m" x="2" y="40" font-size="14" xml:space="preserve"><tspan fill="#b45309" font-weight="700">~ ❯ </tspan><tspan fill="#1b1e25">exit</tspan><tspan fill="#a8adb8">    [process completed]</tspan></text>
+<text class="m" x="878" y="40" font-size="12" fill="#5b6372" text-anchor="end">no trackers · no widgets · plain SVG from this repo</text>
+</svg>

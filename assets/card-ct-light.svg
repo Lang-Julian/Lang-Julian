@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="424" height="172" viewBox="0 0 424 172" role="img" aria-labelledby="title">
+<title id="title">ct — Tag terminals, not tabs — a persistent visual watermark so you know which terminal is which.</title>
+<style>
+  .m { font-family: ui-monospace,SFMono-Regular,'SF Mono',Menlo,Monaco,Consolas,'Liberation Mono','DejaVu Sans Mono',monospace; }
+  .s { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Helvetica,Arial,sans-serif; }
+  .f { animation: in .45s cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+  @keyframes blink { 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .f, .cur { animation: none !important; } }
+</style>
+<rect x=".5" y=".5" width="423" height="171" rx="10.5" fill="#ffffff" stroke="#dcd8ce"/>
+<text class="m" x="22" y="38" font-size="16" font-weight="700"><tspan fill="#b45309">▍</tspan><tspan fill="#1b1e25" dx="9">ct</tspan></text>
+<text class="m" x="402" y="37" font-size="11.5" fill="#5b6372" text-anchor="end">zsh · iTerm2 · WezTerm</text>
+<text class="s" x="22" y="74" font-size="13.5" fill="#1b1e25">Tag terminals, not tabs — a persistent visual</text><text class="s" x="22" y="94" font-size="13.5" fill="#1b1e25">watermark so you know which terminal is which.</text>
+<text class="m" x="22" y="124" font-size="12" xml:space="preserve"><tspan fill="#a8adb8">[ </tspan><tspan fill="#b45309">deploy</tspan><tspan fill="#a8adb8"> ]  </tspan><tspan fill="#a8adb8">[ api ]  [ docs ]  [ bench ]</tspan></text>
+<line x1="22" y1="139.5" x2="402" y2="139.5" stroke="#dcd8ce"/>
+<circle cx="27" cy="155" r="5" fill="#89e051"/>
+<text class="m" x="39" y="159" font-size="11.5" fill="#5b6372" xml:space="preserve">Shell · MIT · cw &lt;tag&gt; jumps back</text>
+</svg>
