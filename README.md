@@ -1,5 +1,5 @@
 <p>
-  <picture><source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/hero-light.svg"><img src="assets/hero-dark.svg" width="880" alt="Julian Antony Lang — Co-Founder &amp; CTO, AI-Z Group, inventor of Brane AIF. I build AI that runs on the machine in front of you and decides what is allowed to leave it. Previously CompuSafe Data Systems, Allianz Technology; co-founder of Omega VR."></picture>
+  <picture><source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/hero-light.svg"><img src="assets/hero-dark.svg" width="880" alt="Julian Antony Lang — Co-Founder &amp; CTO, AI-Z Group, inventor of Brane AIF. I build AI that runs on the machine in front of you and decides what is allowed to leave it."></picture>
 </p>
 
 <p>
