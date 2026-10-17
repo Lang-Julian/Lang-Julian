@@ -43,28 +43,6 @@ THEMES = {
 PI_HEX = ("3.243F6A8885A308D313198A2E03707344A4093822299F31D0082EFA98EC4E6C89"
           "452821E638D01377BE5466CF34E90C6CC0AC29B7C97C50DD3F84D5B5")
 
-WORK = [
-    dict(repo="pidigit", tech="C · ARM64 NEON",
-         desc="One hex digit of π, two billion places in — in 8 s and 2 MB.",
-         detail="pos 536870909 → b0f6c61365a861eb   ·   55.7× naive on 10 cores"),
-    dict(repo="glyphfall", tech="TypeScript",
-         desc="A roguelike deckbuilder that lives in your terminal.",
-         detail="match the suit, grow the chain — the order beats the hand   ·   0 deps"),
-    dict(repo="claude-tower", tech="JavaScript · Node",
-         desc="Air-traffic control for a swarm of Claude Code sessions.",
-         detail="● thinking   ● needs approval   ○ done   ·   localhost only"),
-    dict(repo="facettn", tech="TypeScript · Next.js",
-         desc="A personality test that stores nothing, scored in your browser.",
-         detail="cookies 0   ·   trackers 0   ·   database 0   ·   result in the #fragment"),
-    dict(repo="ct", tech="zsh",
-         desc="Tag terminals, not tabs — a persistent watermark per terminal.",
-         detail="$ ct deploy   → tab colour, badge, background mark   ·   cw deploy jumps back"),
-    dict(repo="price-globe", tech="Next.js · React",
-         desc="Cost of living across six countries, month by month.",
-         detail="▁▂▃▅▇▆▅▃▂▁▂▃   ·   6 countries   ·   20 products   ·   seasonal prices"),
-]
-
-
 # ── type ────────────────────────────────────────────────────────────────────
 
 class Face:
@@ -185,10 +163,6 @@ def hairline(doc, y, color, x1=0, x2=W):
     doc.raw(f'<line x1="{x1}" y1="{y + .5}" x2="{x2}" y2="{y + .5}" stroke="{color}"/>')
 
 
-def arrow(doc, x1, x2, y, color):
-    doc.raw(f'<line x1="{x1}" y1="{y + .5}" x2="{x2 - 4}" y2="{y + .5}" stroke="{color}"/>'
-            f'<path d="M{x2 - 4} {y - 2.5}l4 3-4 3z" fill="{color}"/>')
-
 
 # ── the planet ──────────────────────────────────────────────────────────────
 #
@@ -223,8 +197,10 @@ def _lattice(i, j, k):
 def _noise(x, y, z):
     i, j, k = math.floor(x), math.floor(y), math.floor(z)
     fx, fy, fz = (t * t * (3 - 2 * t) for t in (x - i, y - j, z - k))
-    lerp = lambda a, b, t: a + (b - a) * t
-    c = [[[_lattice(i + a, j + b, k + d) for d in (0, 1)] for b in (0, 1)] for a in (0, 1)]
+    def lerp(a, b, t):
+        return a + (b - a) * t
+
+    c =[[[_lattice(i + a, j + b, k + d) for d in (0, 1)] for b in (0, 1)] for a in (0, 1)]
     return lerp(lerp(lerp(c[0][0][0], c[0][0][1], fz), lerp(c[0][1][0], c[0][1][1], fz), fy),
                 lerp(lerp(c[1][0][0], c[1][0][1], fz), lerp(c[1][1][0], c[1][1][1], fz), fy), fx)
 
@@ -382,35 +358,25 @@ def planet(doc, t, x0, y0):
 # ── pieces ──────────────────────────────────────────────────────────────────
 
 def hero(t):
-    doc = Doc(W, 470, "Julian Antony Lang — Co-Founder & CTO, AI-Z Group",
-              "Julian Antony Lang. Co-Founder and CTO at AI-Z Group in Stuttgart and inventor of Brane AIF, the AI "
+    doc = Doc(W, 410, "Julian Antony Lang — Co-Founder & CTO, AI-Z Group",
+              "Julian Antony Lang. Co-Founder and CTO at AI-Z Group and inventor of Brane AIF, the AI "
               "Interaction Firewall. Builds AI that runs on the machine in front of you and decides "
-              "what is allowed to leave it. Beside the text, a halftone globe turns while a satellite circles it.")
+              "what is allowed to leave it. Previously CompuSafe Data Systems, Allianz Technology, and "
+              "co-founder of Omega VR. Beside the text, a halftone globe turns while a satellite circles it.")
     doc.style.append(FADE)
-    planet(doc, t, W - GRID * PITCH + 12, 14)
-    doc.text(0, 30, "STUTTGART  ·  48.78° N  9.18° E", 10.5, t["subtle"], "mono", 400, .14, cls="f", delay=.1)
-    doc.text(-3, 112, "Julian Antony", 62, t["fg"], "sans", 600, -.035, cls="f", delay=.2)
-    doc.text(-3, 178, "Lang", 62, t["fg"], "sans", 600, -.035, cls="f", delay=.28)
-    doc.text(0, 222, "Co-Founder & CTO, AI-Z Group  ·  Inventor of Brane AIF", 17, t["fg2"], "sans", 500, -.005,
+    planet(doc, t, W - GRID * PITCH + 12, 8)
+    doc.text(-3, 118, "Julian Antony", 62, t["fg"], "sans", 600, -.035, cls="f", delay=.2)
+    doc.text(-3, 184, "Lang", 62, t["fg"], "sans", 600, -.035, cls="f", delay=.28)
+    doc.text(0, 228, "Co-Founder & CTO, AI-Z Group  ·  Inventor of Brane AIF", 17, t["fg2"], "sans", 500, -.005,
              cls="f", delay=.4)
     statement = "I build AI that runs on the machine in front of you — and decides what is allowed to leave it."
     for i, line in enumerate(doc.wrap(statement, 430, 17)):
-        doc.text(0, 254 + i * 26, line, 17, t["muted"], "sans", 400, -.005, cls="f", delay=.48 + i * .06)
-    hairline(doc, 340, t["line"])
-    cols = [
-        ("NOW", ["Co-Founder & CTO", "AI-Z Group, Stuttgart", "Brane AIF, on-prem"]),
-        ("BEFORE", ["CompuSafe Data Systems",
-                    "developer at Allianz Technology",
-                    "GenAI for Siemens Energy" if NAME_SIEMENS else "co-founder, Omega VR (2022)"]),
-        ("OWN", ["architecture", "product · engineering", "technical partnerships"]),
-        ("STACK", ["TypeScript · Python", "Rust · Swift · C", "ARM64 NEON assembly"]),
-    ]
-    for i, (label, lines) in enumerate(cols):
-        x = i * 224
-        doc.text(x, 376, label, 10.5, t["subtle"], "mono", 400, .14, cls="f", delay=.7 + i * .06)
-        for j, line in enumerate(lines):
-            assert doc.measure(line, 13.5) < 214, line
-            doc.text(x, 402 + j * 21, line, 13.5, t["fg2"], "sans", 400, 0, cls="f", delay=.74 + i * .06)
+        doc.text(0, 262 + i * 26, line, 17, t["muted"], "sans", 400, -.005, cls="f", delay=.48 + i * .06)
+    before = ["CompuSafe Data Systems", "Allianz Technology"]
+    before += ["Siemens Energy"] if NAME_SIEMENS else []
+    before += ["co-founder, Omega VR"]
+    doc.text(0, 372, "PREVIOUSLY", 10, t["subtle"], "mono", 400, .14, cls="f", delay=.7)
+    doc.text(92, 372, "  ·  ".join(before), 10, t["muted"], "mono", 400, .06, cls="f", delay=.74)
     return doc.render()
 
 
@@ -421,64 +387,6 @@ def section(t, num, label, right=""):
     if right:
         doc.text(W, 34, right, 10.5, t["subtle"], "mono", 400, .1, anchor="end")
     hairline(doc, 53, t["line"])
-    return doc.render()
-
-
-def now(t):
-    """Brane AIF — what it does and how it is built. Wording matches ai-z-group.com/en/brane."""
-    doc = Doc(W, 236, "Brane AIF — the AI Interaction Firewall",
-              "As CTO I own the architecture of Brane AIF, an on-prem firewall between a company and every "
-              "AI model. Every prompt is inspected, classified by intent, checked against policy and routed, "
-              "in under 200 ms. Sensitive data goes to a private model and never leaves; the rest reaches "
-              "cloud models anonymised and is rehydrated in the answer.")
-    copy = ("As CTO I own the architecture of Brane AIF — an on-prem firewall between a company and every "
-            "AI model. Every prompt is classified in under 200 ms. What is sensitive stays on a private "
-            "model; the rest leaves anonymised and is rehydrated in the answer.")
-    for i, line in enumerate(doc.wrap(copy, 300, 15)):
-        doc.text(0, 40 + i * 24, line, 15, t["fg2"], "sans", 400, -.003)
-    doc.text(0, 214, "ai-z-group.com/brane  ↗", 10.5, t["subtle"], "mono", 400, .1)
-
-    # The box, with a gap in its top edge for the label.
-    bx, by, bw, bh = 384, 60, 282, 112
-    label = "BRANE AIF · ON-PREM"
-    lw = doc.measure(label, 10, "mono", 500, .14)
-    lx = bx + 18
-    doc.raw(f'<path d="M{lx - 6} {by + .5}H{bx + .5}V{by + bh + .5}H{bx + bw + .5}V{by + .5}H{lx + lw + 6}" '
-            f'fill="none" stroke="{t["faint"]}"/>')
-    doc.text(lx, by + 4, label, 10, t["fg"], "mono", 500, .14)
-
-    stages = ["inspect", "intent", "policy", "route"]
-    sx = bx + 20
-    for i, s in enumerate(stages):
-        doc.text(sx, by + 42, str(i + 1), 10, t["subtle"], "mono", 400)
-        w = doc.text(sx, by + 63, s, 12.5, t["fg"], "mono", 400)
-        if i < len(stages) - 1:
-            arrow(doc, sx + w + 6, sx + w + 18, by + 59, t["subtle"])
-            sx += w + 24
-    doc.text(bx + 20, by + 94, "every prompt  < 200 ms", 10.5, t["muted"], "mono", 400, .04)
-
-    doc.text(bx - 76, by + 63, "prompt", 12.5, t["muted"], "mono", 400)
-    arrow(doc, bx - 24, bx - 4, by + 59, t["subtle"])
-
-    ex = bx + bw + 1
-    for y, name, note in ((by + 26, "private LLM", "sensitive · stays local"),
-                          (by + 96, "cloud LLM", "anonymised · rehydrated")):
-        doc.raw(f'<path d="M{ex} {by + 59.5}H{ex + 12.5}V{y - 3.5}H{ex + 22}" fill="none" stroke="{t["subtle"]}"/>')
-        arrow(doc, ex + 22, ex + 28, y - 4, t["subtle"])
-        doc.text(ex + 36, y, name, 12.5, t["fg"], "mono", 500)
-        doc.text(ex + 36, y + 17, note, 10, t["muted"], "mono", 400)
-        assert ex + 36 + doc.measure(note, 10, "mono") <= W, note
-    return doc.render()
-
-
-def work_row(t, i, w):
-    doc = Doc(W, 46, f"{w['repo']} — {w['desc']}")
-    if i > 1:
-        hairline(doc, 0, t["line"])
-    doc.text(0, 28, f"{i:02d}", 10, t["subtle"], "mono", 400, .1)
-    doc.text(36, 29, w["repo"], 13.5, t["fg2"], "mono", 500, -.01)
-    doc.text(200, 29, w["desc"], 13.5, t["muted"], "sans", 400, -.003)
-    doc.text(W, 28, f"{w['tech']}  ↗", 10, t["subtle"], "mono", 400, .06, anchor="end")
     return doc.render()
 
 
@@ -494,25 +402,15 @@ def upstream_row(t, i, u):
 
 
 def footer(t):
-    doc = Doc(W, 84, "π in hexadecimal, fading out — plain SVG, no trackers, no widgets")
-    hairline(doc, 0, t["line"])
+    doc = Doc(W, 40, "π in hexadecimal, fading out")
     adv = doc.measure("0", 11, "mono", 400, .18) + 11 * .18
     digits = PI_HEX[:90]
     for i, ch in enumerate(digits):
         a = (1 - i / len(digits)) ** 1.6
         if a < .04:
             break
-        doc.text(i * adv, 38, ch, 11, t["muted"], "mono", 400, opacity=a)
-    doc.text(0, 70, "plain SVG drawn by scripts/build.py  ·  no trackers  ·  no widgets", 10.5,
-             t["subtle"], "mono", 400, .08)
-    doc.text(W, 70, "π in base 16", 10.5, t["subtle"], "mono", 400, .08, anchor="end")
+        doc.text(i * adv, 24, ch, 11, t["muted"], "mono", 400, opacity=a)
     return doc.render()
-
-
-# ── README ──────────────────────────────────────────────────────────────────
-
-RAW = "https://raw.githubusercontent.com/Lang-Julian/Lang-Julian/output"
-
 
 def pic(name, alt, link=None, src=None):
     dark, light = (f"{src}-dark.svg", f"{src}-light.svg") if src else (f"assets/{name}-dark.svg", f"assets/{name}-light.svg")
@@ -523,32 +421,17 @@ def pic(name, alt, link=None, src=None):
 
 
 def readme():
-    who = "Allianz Technology" + (" and Siemens Energy" if NAME_SIEMENS else "")
-    blocks = [
-        [pic("hero", "Julian Antony Lang — Co-Founder & CTO, AI-Z Group, inventor of Brane AIF. I build AI that runs "
-                     "on the machine in front of you and decides what is allowed to leave it. Before: CompuSafe Data "
-                     f"Systems, developer at {who}; co-founder of Omega VR. Beside the name, a halftone globe turns.")],
-        [pic("s1", "Now: Brane AIF, the AI Interaction Firewall"),
-         pic("now", "As CTO I own the architecture of Brane AIF, an on-prem firewall between a company and every AI "
-                    "model. Every prompt is inspected, classified by intent, checked against policy and routed in under "
-                    "200 ms. Sensitive data stays on a private model; the rest reaches cloud models anonymised and is "
-                    "rehydrated in the answer.", link="https://ai-z-group.com/en/brane")],
-    ]
+    blocks = [[pic("hero", "Julian Antony Lang — Co-Founder & CTO, AI-Z Group, inventor of Brane AIF. I build AI "
+                           "that runs on the machine in front of you and decides what is allowed to leave it. "
+                           "Previously CompuSafe Data Systems, Allianz Technology; co-founder of Omega VR.")]]
     if UPSTREAM:
         rows = [pic(f"up-{r.replace('/', '-')}-{n}", f"{r}#{n} — {title} ({state})",
                     link=f"https://github.com/{r}/pull/{n}") for r, n, title, state in UPSTREAM]
         blocks.append([pic("s-upstream", "Open source: upstream pull requests"), "<br>".join(rows)])
-    blocks.append([pic("s-activity", "Activity. Client work before AI-Z lives on internal Git servers."),
-                   pic(None, "A snake eats the contribution graph of the last twelve months, one day at a time.",
-                       src=f"{RAW}/snake")])
-    blocks.append([pic("s-projects", "Side projects, public and MIT licensed"),
-                   "<br>".join(pic(f"work-{w['repo']}", f"{w['repo']} — {w['desc']}",
-                                   link=f"https://github.com/Lang-Julian/{w['repo']}") for w in WORK)])
-    blocks.append([pic("footer", "Pi in hexadecimal, fading out. Plain SVG drawn by scripts/build.py — no trackers, no widgets.")])
+    blocks.append([pic("footer", "Pi in hexadecimal, fading out.")])
     body = "\n\n".join("<p>\n  " + "\n  ".join(b) + "\n</p>" for b in blocks)
     return (body + "\n\n<!-- Generated by scripts/build.py, README included: edit the data there and run\n"
-            "     uv run --no-project --with fonttools --with uharfbuzz python scripts/build.py\n"
-            "     The snake is redrawn daily by .github/workflows/snake.yml onto the output branch. -->\n")
+            "     uv run --no-project --with fonttools --with uharfbuzz python scripts/build.py -->\n")
 
 
 def main():
@@ -558,25 +441,11 @@ def main():
     for old in OUT.glob("*.svg"):
         old.unlink()
     for name, t in THEMES.items():
-        files = {
-            f"hero-{name}.svg": hero(t),
-            f"s1-{name}.svg": section(t, "01", "Now — Brane AIF", "the AI Interaction Firewall"),
-            f"now-{name}.svg": now(t),
-        }
-        n = 2
+        files = {f"hero-{name}.svg": hero(t), f"footer-{name}.svg": footer(t)}
         if UPSTREAM:
-            files[f"s-upstream-{name}.svg"] = section(t, f"{n:02d}", "Open source", "upstream pull requests")
+            files[f"s-upstream-{name}.svg"] = section(t, "01", "Open source", "upstream pull requests")
             for i, u in enumerate(UPSTREAM, 1):
                 files[f"up-{u[0].replace('/', '-')}-{u[1]}-{name}.svg"] = upstream_row(t, i, u)
-            n += 1
-        files[f"s-activity-{name}.svg"] = section(
-            t, f"{n:02d}", "Activity", "client work before AI-Z lives on internal Git servers")
-        files[f"s-projects-{name}.svg"] = section(t, f"{n + 1:02d}", "Side projects", "public · MIT")
-        files.update({
-            f"footer-{name}.svg": footer(t),
-        })
-        for i, w in enumerate(WORK, 1):
-            files[f"work-{w['repo']}-{name}.svg"] = work_row(t, i, w)
         for fn, svg in files.items():
             (OUT / fn).write_text(svg, encoding="utf-8")
     (ROOT / "README.md").write_text(readme(), encoding="utf-8")
